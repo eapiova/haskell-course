@@ -53,3 +53,24 @@ still need to make another choice.
 
 6. Adapt adapt "solveMaze" function to use "showCurrentChoice" and play with your new game using GHCi! :D
 -}
+
+data Move = GoLeft | GoRight | GoForward
+
+data Maze = Exit | Wall | Branch Maze Maze Maze deriving (Show)
+
+move :: Maze -> Move -> Maze
+move (Branch leftMaze _ _) GoLeft = leftMaze
+move (Branch _ forwardMaze _) GoForward = forwardMaze
+move (Branch _ _ rightMaze) GoRight = rightMaze
+move maze mv = maze
+
+testMaze :: Maze
+testMaze = Branch Wall (Branch Wall Wall (Branch (Branch Exit Wall Wall) Wall Wall)) Wall
+
+showCurrentChoice :: Maze -> String
+showCurrentChoice Exit = "YOU'VE FOUND THE EXIT!!"
+showCurrentChoice Wall = "You've hit a wall!"
+showCurrentChoice _ = "You're still inside the maze. Choose a path, brave adventurer: GoLeft, GoRight, or GoForward."
+
+solveMaze :: Maze -> [Move] -> String
+solveMaze maze moves = showCurrentChoice $ foldl move maze moves

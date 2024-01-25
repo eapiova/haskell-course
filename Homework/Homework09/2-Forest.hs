@@ -42,3 +42,27 @@ Using GHCi, like the "Maze" game, this game should look like this:
 *Main> solveForest testForest [GoForward, GoLeft , GoRight]
 "YOU'VE FOUND THE EXIT!!"
 -}
+
+data Move = GoLeft | GoRight | GoForward
+
+data Forest work = Exit | Branch work (Forest work) (Forest work) (Forest work) deriving (Show)
+
+move :: Num a => (a, Forest a) -> Move -> (a, Forest a)
+move (stamina, Branch work leftForest _ _) GoLeft = (stamina - work, leftForest)
+move (stamina, Branch work _ forwardForest _) GoForward = (stamina - work, forwardForest)
+move (stamina, Branch work _ _ rightForest) GoRight = (stamina - work, rightForest)
+move (stamina, Exit) _ = (stamina, Exit)
+
+testForest :: Forest Integer
+testForest = Branch 5 (Branch 6 Exit Exit Exit) (Branch 2 (Branch 10 Exit Exit Exit) Exit (Branch 6 (Branch 4 Exit Exit Exit) Exit Exit)) Exit
+
+showCurrentChoice :: (Ord a, Num a, Show a) => (a, Forest work) -> String
+showCurrentChoice (stamina, Exit)
+    | stamina > 0 = "YOU'VE FOUND THE EXIT!!"
+    | otherwise = "You ran out of stamina and died -.-!"
+showCurrentChoice (stamina, Branch {})
+    | stamina > 0 = "You have " ++ show stamina ++ " and you're still inside the Forest. Choose a path, brave adventurer: GoLeft, GoRight, or GoForward."
+    | otherwise = "You ran out of stamina and died -.-!"
+
+solveForest :: (Ord a, Num a, Show a) => Forest a -> [Move] -> String
+solveForest forest mvs = showCurrentChoice $ foldl move (10, forest) mvs

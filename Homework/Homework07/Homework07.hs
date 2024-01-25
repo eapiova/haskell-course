@@ -1,6 +1,7 @@
 -- Question 1
 -- Investigate the `Bounded` type class. What behaviours it provides?
 
+-- provides a minimum and maximum bound 
 
 -- Question 2
 -- The types Int and Word bellong to the same type classes. What is the difference
@@ -15,9 +16,12 @@
 -- Add the most general type signatures possible to the functions below.
 -- Then uncomment the functions and try to compile.
 
---f1 x y z = show (x / y) ++ z
 
---f2 x = if x == maxBound then minBound else succ x
+f1 :: (Show a, Fractional a) => a -> a -> [Char] -> [Char]
+f1 x y z = show (x / y) ++ z
+
+f2 :: (Eq a, Bounded a, Enum a) => a -> a
+f2 x = if x == maxBound then minBound else succ x
 
 
 -- Question 5

@@ -1,4 +1,4 @@
 {
   "haskell.manageHLS": "GHCup",
-  "haskell.ghcupExecutablePath": "/home/gitpod/.ghcup/bin/ghcup"
+  "haskell.ghcupExecutablePath": "/home/eapiova/.ghcup/bin/ghcup"
 }

@@ -5,6 +5,8 @@
 -- >>> repeat 17
 --[17,17,17,17,17,17,17,17,17...
 
+repeat' :: t -> [t]
+repeat' v = v : repeat' v
 
 -- Question 2
 -- Using the `repeat'` function and the `take` function we defined in the lesson (comes with Haskell),
@@ -18,12 +20,17 @@
 -- >>> replicate 4 True
 -- [True,True,True,True]
 
+replicate' :: Int -> a -> [a]
+replicate' n = take n . repeat'
 
 -- Question 3
 -- Write a function called `concat'` that concatenates a list of lists.
 --
 -- >>> concat' [[1,2],[3],[4,5,6]]
 -- [1,2,3,4,5,6]
+
+concat' :: Foldable t => t [a] -> [a]
+concat' = foldr (++) []
 
 
 -- Question 4
@@ -45,6 +52,11 @@
 -- >>> zip' [1..] []
 -- []
 
+zip' :: [a] -> [b] -> [(a, b)]
+zip' [] _ = []
+zip' _ [] = []
+zip' (x1:xs1) (x2:xs2) = (x1, x2) : zip' xs1 xs2
+
 
 
 -- Question 5
@@ -60,6 +72,11 @@
 -- >>> zipWith (+) [1, 2, 3] [4, 5, 6]
 -- [5,7,9]
 
+zipWith' :: (t1 -> t2 -> a) -> [t1] -> [t2] -> [a]
+zipWith' _ [] _ = []
+zipWith' _ _ [] = []
+zipWith' f (x1:xs1) (x2:xs2) = f x1 x2 : zipWith' f xs1 xs2
+
 
 -- Question 6
 -- Write a function called `takeWhile'` that takes a precate and a list and
@@ -72,10 +89,26 @@
 -- >>> takeWhile (< 0) [1,2,3]
 -- []
 
+takeWhile' :: (a -> Bool) -> [a] -> [a]
+takeWhile' _ [] = []
+takeWhile' p (x:xs)
+  | p x = x : takeWhile' p xs
+  | otherwise = []
 
 -- Question 7 (More difficult)
 -- Write a function that takes in an integer n, calculates the factorial n! and
 -- returns a string in the form of 1*2* ... *n = n! where n! is the actual result.
+
+stringFactorial :: (Eq a, Num a, Show a) => a -> String
+stringFactorial n = stringDecomposition n ++ " = " ++ show (factorial n)
+  where
+    stringDecomposition 0 = "1"
+    stringDecomposition 1 = "1"
+    stringDecomposition n = stringDecomposition (n - 1) ++ "*" ++ show n
+    factorial 0 = 1
+    factorial 1 = 1
+    factorial n = n * factorial (n - 1)
+
 
 
 -- Question 8
@@ -100,3 +133,13 @@ orderList =
 
 deliveryCost :: Double
 deliveryCost = 8.50
+
+costOrder :: [(a, Double)] -> Double
+costOrder order = deliveryCost + sum (zipWith (*) (map snd order) (map snd bevogBeerPrices))
+
+beerCosts :: [(String, Double)] -> Double
+beerCosts =
+  foldr (+) deliveryCost
+    . zipWith (*) (map snd bevogBeerPrices)
+    . map snd
+    . filter (\name -> fst name `elem` map fst bevogBeerPrices)
